@@ -38,8 +38,8 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/moneywaters/scenesmith:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=registry,ref=ghcr.io/moneywaters/scenesmith:latest
+          cache-to: type=registry,ref=ghcr.io/moneywaters/scenesmith:cache,mode=max
 
       - name: Make package public
         run: |

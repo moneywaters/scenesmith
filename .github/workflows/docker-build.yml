@@ -40,3 +40,11 @@ jobs:
           tags: ghcr.io/moneywaters/scenesmith:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Make package public
+        run: |
+          curl -s -X PATCH \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/user/packages/container/scenesmith \
+            -d '{"visibility":"public"}'

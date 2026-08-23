@@ -94,14 +94,14 @@ ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
 ENV PYTHONPATH=/app
 ENV PYTHONUNBUFFERED=1
 
-# Default command: print usage help.
-CMD ["python", "-c", \
-    "print('scenesmith Docker container\\n')\n\
-print('Usage examples:\\n')\n\
-print('  # Smoke test')\n\
-print('  docker run --gpus all scenesmith python -c \"import torch; print(torch.cuda.is_available()); import scenesmith\"\\n')\n\
-print('  # Run unit tests')\n\
-print('  docker run --gpus all scenesmith pytest tests/unit/ -x\\n')\n\
-print('  # Run scene generation (requires data volumes and API keys)')\n\
-print('  docker compose up\\n')\n\
-print('See README.md for full documentation.')"]
+# Default command: print usage help and keep the container alive
+# (required by GPU cloud platforms like SimplePod that expect a persistent process).
+RUN printf '%s\n' \
+    '#!/bin/bash' \
+    'echo "scenesmith container starting..."' \
+    'echo "Smoke test: python -c \"import torch; print(torch.cuda.is_available()); import scenesmith\""' \
+    'echo "Run pipeline: python main.py +name=my_experiment"' \
+    'trap "echo SIGTERM received; exit 0" TERM INT' \
+    'while true; do sleep 30; done' \
+    > /usr/local/bin/scenesmith-entry.sh && chmod +x /usr/local/bin/scenesmith-entry.sh
+CMD ["/usr/local/bin/scenesmith-entry.sh"]
